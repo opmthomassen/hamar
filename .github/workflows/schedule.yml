@@ -22,7 +22,7 @@ jobs:
           pip install -r requirements.txt || echo "Ingen requirements.txt"
 
       - name: Kjør scraper
-        run: python hamar.py
+        run: python scraper.py
 
       - name: Commit og push oppdatert CSV
         run: |
