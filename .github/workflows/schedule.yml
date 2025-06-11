@@ -5,6 +5,9 @@ on:
     - cron: "0 * * * *" # Hver time
   workflow_dispatch: # Lar deg kjøre manuelt fra GitHub
 
+permissions:
+  contents: write
+
 jobs:
   run-script:
     runs-on: ubuntu-latest
@@ -25,10 +28,11 @@ jobs:
         run: python scraper.py
 
       - name: Commit og push oppdatert CSV
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add hamar.csv
           git commit -m "Oppdater CSV" || echo "Ingen endringer"
-          REPO="https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}"
-          git push "$REPO" HEAD:main
+          git push https://x-access-token:$TOKEN@github.com/${{ github.repository }} HEAD:main
