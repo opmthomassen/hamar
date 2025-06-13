@@ -2,7 +2,7 @@ name: Kjør scraper hver time
 
 on:
   schedule:
-    - cron: "0 * * * *" # Hver time
+    - cron: "0 6 * * *" # Hver dag
   workflow_dispatch: # Lar deg kjøre manuelt fra GitHub
 
 permissions:
