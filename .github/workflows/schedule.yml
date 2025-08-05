@@ -1,8 +1,8 @@
-name: Kjør scraper hver dag
+name: Kjør scraper daglig
 
 on:
   schedule:
-    - cron: "0 6 * * *" # daglig 06:00
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -11,11 +11,12 @@ permissions:
 jobs:
   run-script:
     runs-on: ubuntu-latest
+
     steps:
       - name: Sjekk ut koden
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # viktig!
+          fetch-depth: 0 # Hent hele historikken
 
       - name: Sett opp Python
         uses: actions/setup-python@v5
@@ -29,7 +30,7 @@ jobs:
       - name: Kjør scraper
         run: python scraper.py
 
-      - name: Commit og push oppdatert CSV
+      - name: Commit og push CSV hvis endringer
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -38,8 +39,9 @@ jobs:
           git remote set-url origin https://x-access-token:$TOKEN@github.com/${{ github.repository }}
 
           git add meta.csv google.csv
-          git diff --cached --quiet && echo "Ingen endringer" && exit 0
+          git diff --cached --quiet && echo "Ingen endringer – hopper over push" && exit 0
 
           git commit -m "Oppdater CSV"
-          git pull --rebase origin main
+          git fetch origin main
+          git rebase origin/main
           git push origin HEAD:main
