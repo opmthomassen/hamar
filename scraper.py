@@ -16,6 +16,7 @@ soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 
 event_list = soup.findAll('a', attrs = {'class':'event-list-card'}) 
 events = []
 added = []
+order = 1
 
 for row in event_list:
     event = {}
@@ -23,6 +24,7 @@ for row in event_list:
     # event['id-hash'] = hash_sha256(row.h3.text)
     event['url'] = row['href']
     event['price'] = "NOK 100"
+    event['order'] = order
 
     event['id'] = event['url'].split('/')[4]
 
@@ -40,12 +42,13 @@ for row in event_list:
     if "Utstilling" not in event['title'] and event['title'] not in added:
         events.append(event)
         added.append(event['title'])
+        order += 1
     
 
 
 filename = 'meta.csv'
 with open(filename, 'w', newline='') as f:
-    w = csv.DictWriter(f,['id', 'price', 'title', 'url', 'img', 'date', 'ticketStatus' ])
+    w = csv.DictWriter(f,['id', 'price', 'order', 'title', 'url', 'img', 'date', 'ticketStatus' ])
     w.writeheader()
     for event in events:
         w.writerow(event)
