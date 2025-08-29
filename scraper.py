@@ -18,28 +18,36 @@ events = []
 added = []
 order = 1
 
+
+blocklist_titles = ["utstilling", "debatt", "politikk", "politisk"]  # legg til det du vil
+exclude_ticket_statuses = ["Utsolgt"]  # legg til flere statuser hvis ønskelig
+
+
 for row in event_list:
     event = {}
-    event['title'] = row.h3.text
-    # event['id-hash'] = hash_sha256(row.h3.text)
+    event['title'] = row.h3.text.strip()
     event['url'] = row['href']
     event['price'] = "NOK 100"
     event['order'] = order
-
     event['id'] = event['url'].split('/')[4]
 
     img_long = re.findall(r'\((.*?)\)', row.div['style'])
     event['img'] = str(img_long).split("'")[1]
-    
-    event['date'] = row.span.text
+
+    event['date'] = row.span.text.strip()
     tickets_long = row.find('span', class_='tickets')
-    event['ticketStatus'] =  tickets_long.text
+    event['ticketStatus'] = tickets_long.text.strip()
 
-    if event['title'] in added:
-        print(event['title'])
+    # Sjekk om tittel inneholder et blokkeringsord (case-insensitivt)
+    if any(word.lower() in event['title'].lower() for word in blocklist_titles):
+        continue
 
-    
-    if "Utstilling" not in event['title'] and event['title'] not in added:
+    # Sjekk om ticketstatus skal ekskluderes
+    if event['ticketStatus'] in exclude_ticket_statuses:
+        continue
+
+    # Unngå duplikater
+    if event['title'] not in added:
         events.append(event)
         added.append(event['title'])
         order += 1
