@@ -1,4 +1,4 @@
-name: Kjør scraper daglig
+name: Kjør scraper hver time
 
 on:
   schedule:
